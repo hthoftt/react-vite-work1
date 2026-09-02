@@ -1,0 +1,95 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+function Login() {
+  // 登入狀態
+  const [loginState, setLoginState] = useState({});
+  // 切換登入成功後畫面
+  const navigate = useNavigate();
+  // 建立帳號密碼
+  const [data, setData] = useState({
+    username: "",
+    password: "",
+  });
+  // 讀取帳號密碼
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData({ ...data, [name]: value });
+  };
+  // 送出帳號密碼
+  const submit = async (e) => {
+    try {
+      const res = await axios.post("/v2/admin/signin", data);
+      const { token, expired } = res.data;
+      document.cookie = `hexToken=${token}; expires=${new Date(expired)};`;
+      // 儲存 Token,於指定時間後自動失效
+      if (res.data.success) {
+        navigate("/admin/products");
+      }
+    } catch (error) {
+      console.log(error.response?.data);
+      setLoginState(error.response?.data);
+    }
+  };
+  // 連動鍵盤Enter為送出
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      submit();
+    }
+  };
+
+  return (
+    <div className="container py-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <h2>登入帳號</h2>
+          <div
+            className={`alert alert-danger ${loginState.message ? "d-block" : "d-none"}`}
+            role="alert"
+          >
+            {loginState.message}
+          </div>
+          <div className="mb-2">
+            <label htmlFor="email" className="form-label w-100">
+              Email
+              <input
+                id="email"
+                className="form-control"
+                name="username"
+                type="email"
+                placeholder="Email Address"
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+              />
+            </label>
+          </div>
+          <div className="mb-2">
+            <label htmlFor="password" className="form-label w-100">
+              密碼
+              <input
+                type="password"
+                className="form-control"
+                name="password"
+                id="password"
+                placeholder="name@example.com"
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+              />
+            </label>
+          </div>
+          <button type="button" className="btn btn-primary" onClick={submit}>
+            登入
+          </button>
+          <div className="mt-4">
+            <p className="text-end text-secondary">
+              # tonyhung92568@gmail.com # 12345678
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Login;

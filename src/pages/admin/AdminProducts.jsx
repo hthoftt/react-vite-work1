@@ -1,0 +1,154 @@
+import { useEffect, useRef, useState } from "react";
+import { Modal } from "bootstrap";
+import axios from "axios";
+import ProductModal from "../../components/ProductModal";
+import DeleteModal from "../../components/DeleteModal";
+import Pagination from "../../components/Pagination";
+import Loading from "../../components/Loading";
+
+function AdminProducts() {
+  const [products, setProducts] = useState([]); //存所有產品資訊
+  const [pagination, setPagination] = useState({}); //存分頁
+  // type: 決定modal展開的用途
+  const [type, setType] = useState("create"); //判斷create或edit
+  const [tempProduct, setTempProduct] = useState({}); //存目前點擊的產品
+  const productModal = useRef(null); // 商品模板開關
+  const deleteModal = useRef(null); // 刪除模板開關
+  const [isLoading, setLoading] = useState(false);
+
+  const getProducts = async (page = 1) => {
+    setLoading(true);
+    const productRes = await axios.get(
+      `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/products?page=${page}`,
+    ); // 拿資訊
+    console.log(productRes);
+    setProducts(productRes.data.products); //存產品
+    setPagination(productRes.data.pagination); //存分頁
+    setLoading(false);
+  };
+
+  // 進入頁面就會取得資料
+  useEffect(() => {
+    productModal.current = new Modal("#productModal", { backdrop: "static" });
+    deleteModal.current = new Modal("#deleteModal", { backdrop: "static" });
+    getProducts();
+  }, []);
+
+  // 打開商品模板
+  const openProductModal = (type, product) => {
+    setType(type); //存create或edit
+    setTempProduct(product); //存目前點擊的產品
+    productModal.current.show();
+  };
+
+  // 關閉商品模板
+  const closeProductModal = () => {
+    productModal.current.hide();
+  };
+
+  // 開啟刪除商品模板
+  const openDeleteModal = (product) => {
+    setTempProduct(product); //存目前點擊的產品
+    deleteModal.current.show();
+  };
+
+  // 關閉刪除商品模板
+  const closeDeleteModal = () => {
+    deleteModal.current.hide();
+  };
+
+  // 取得token資訊
+  const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("hexToken"))
+    ?.split("=")[1];
+
+  // 刪除產品
+  const deleteProduct = async (id) => {
+    try {
+      const res = await axios.delete(
+        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/product/${id}`,
+        {
+          headers: { Authorization: token },
+        },
+      );
+      if (res.data.success === true) {
+        getProducts();
+        closeDeleteModal();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <div className="p-3">
+      <Loading isLoading={isLoading} />
+      <ProductModal
+        closeProductModal={closeProductModal}
+        getProducts={getProducts}
+        tempProduct={tempProduct}
+        type={type}
+      />
+      <DeleteModal
+        closeDeleteModal={closeDeleteModal}
+        text={tempProduct.title}
+        deleteItem={deleteProduct}
+        id={tempProduct.id}
+      />
+      <h3>產品列表</h3>
+      <hr />
+      <div className="text-end">
+        <button
+          type="button"
+          className="btn btn-primary btn-sm"
+          onClick={() => openProductModal("create", {})}
+        >
+          建立新商品
+        </button>
+      </div>
+      <table className="table">
+        <thead>
+          <tr>
+            <th scope="col">分類</th>
+            <th scope="col">名稱</th>
+            <th scope="col">售價</th>
+            <th scope="col">啟用狀態</th>
+            <th scope="col">編輯</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((product) => {
+            return (
+              <tr key={product.id}>
+                <td>{product.category}</td>
+                <td>{product.title}</td>
+                <td>{product.price}</td>
+                <td>{product.is_enabled ? "啟用" : "未啟用"}</td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => openProductModal("edit", product)}
+                  >
+                    編輯
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger btn-sm ms-2"
+                    onClick={() => openDeleteModal(product)}
+                  >
+                    刪除
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <Pagination pagination={pagination} getProducts={getProducts} />
+    </div>
+  );
+}
+
+export default AdminProducts;
