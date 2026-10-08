@@ -1,15 +1,18 @@
 import { Link, useOutletContext, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { Input } from "../../components/FormElement";
-import axios from "axios";
-// "-P-sZz6JqEZxX5I4gybt"
+import { createAsyncMessage } from "../../slice/messageSlice";
+import { api, getErrorData } from "../../api";
+
 function CheckOut() {
   const navigate = useNavigate();
-  const { cartData } = useOutletContext();
+  const dispatch = useDispatch();
+  const { cartData, getCartData } = useOutletContext();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     mode: "onTouched",
   });
@@ -26,12 +29,13 @@ function CheckOut() {
         message: "",
       },
     };
-    const res = await axios.post(
-      `/v2/api/${import.meta.env.VITE_APP_API_PATH}/order`,
-      form,
-    );
-    // console.log("確認表單:",res);
-    navigate(`/success/${res.data.orderId}`);
+    try {
+      const res = await api.post("/order", form);
+      getCartData(); // 下單後購物車已清空,更新右上角數量
+      navigate(`/success/${res.data.orderId}`);
+    } catch (err) {
+      dispatch(createAsyncMessage(getErrorData(err)));
+    }
   };
 
   return (
@@ -50,9 +54,9 @@ function CheckOut() {
                   register={register}
                   rules={{
                     required: "必填",
-                    maxLength: {
-                      value: /^\S+@\S+$/i,
-                      message: "Email 格式必須包含 @",
+                    pattern: {
+                      value: /^\S+@\S+\.\S+$/,
+                      message: "Email 格式不正確",
                     },
                   }}
                 />
@@ -117,8 +121,9 @@ function CheckOut() {
               <button
                 type="submit"
                 className="btn btn-dark py-3 px-7 rounded-0"
+                disabled={isSubmitting || !cartData?.carts?.length}
               >
-                送出表單
+                {isSubmitting ? "送出中..." : "送出表單"}
               </button>
             </div>
           </form>

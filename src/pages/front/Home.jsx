@@ -30,7 +30,7 @@ function Home() {
     },
     {
       id: 3,
-      img: "./woman2.png",
+      img: "./woman2.jpg",
       name: "王美玲",
       job: "收藏家",
       text: "客服回覆迅速，付款安全，配送也很快。這是我第一次在線上購買藝術品，體驗非常好，之後還會再回購。",
@@ -66,6 +66,7 @@ function Home() {
                   <img
                     src={item.img}
                     className="card-img-top rounded-0"
+                    loading="lazy"
                     alt="圖片"
                   />
                   <div className="card-body p-0">
@@ -123,6 +124,7 @@ function Home() {
               <div className="col-md-4" key={num.id}>
                 <img
                   src={num.img}
+                  loading="lazy"
                   alt="圖片"
                   style={{
                     width: "160px",

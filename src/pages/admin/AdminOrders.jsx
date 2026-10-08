@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Modal } from "bootstrap";
-import axios from "axios";
 import OrderModal from "../../components/OrderModal";
 import DeleteModal from "../../components/DeleteModal";
 import Pagination from "../../components/Pagination";
 import Loading from "../../components/Loading";
+import { adminApi } from "../../api";
 
 function AdminOrders() {
   const [orders, setOrders] = useState([]); //存所有產品資訊
@@ -17,14 +17,14 @@ function AdminOrders() {
 
   const getOrders = async (page = 1) => {
     setLoading(true);
-    const res = await axios.get(
-      `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/orders?page=${page}`,
-    ); // 拿資訊
-    // console.log("order:", res);
-    setOrders(res.data.orders); //存產品
-    setPagination(res.data.pagination); //存分頁
-    setLoading(false);
-    setCurrentPage(page);
+    try {
+      const res = await adminApi.get(`/orders?page=${page}`); // 拿資訊
+      setOrders(res.data.orders); //存產品
+      setPagination(res.data.pagination); //存分頁
+      setCurrentPage(page);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 進入頁面就會取得資料
@@ -59,17 +59,10 @@ function AdminOrders() {
 
   const deleteOrder = async () => {
     try {
-      const res = await axios.delete(
-        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/order/${tempOrder.id}`,
-      );
-      // console.log(res);
-      setLoading(false);
+      await adminApi.delete(`/order/${tempOrder.id}`);
       getOrders(currentPage);
+    } finally {
       closeDeleteModal();
-    } catch (err) {
-      // console.error(err.response);
-      closeDeleteModal();
-      setLoading(false);
     }
   };
 
@@ -85,7 +78,7 @@ function AdminOrders() {
       <DeleteModal
         closeDeleteModal={closeDeleteModal}
         deleteItem={deleteOrder}
-        text={tempOrder.title}
+        text={`訂單 ${tempOrder.id}`}
         id={tempOrder.id}
       />
       <h3>訂單列表</h3>
@@ -102,9 +95,9 @@ function AdminOrders() {
           </tr>
         </thead>
         <tbody>
-          {orders.map((order, i) => {
+          {orders.map((order) => {
             return (
-              <tr key={i}>
+              <tr key={order.id}>
                 <td>{order.id}</td>
                 <td>
                   {order.user?.name}

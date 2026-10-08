@@ -1,21 +1,18 @@
 import { Outlet, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
-import axios from "axios";
 import MessageToast from "../../components/MessageToast";
+import { api } from "../../api";
 
 function FrontLayout() {
   const [cartData, setCartData] = useState({});
 
   const getCartData = async () => {
     try {
-      const res = await axios.get(
-        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/cart`,
-      );
-      // console.log(res);
+      const res = await api.get("/cart");
       setCartData(res.data.data || { carts: [] });
-    } catch (err) {
-      // console.error(err);
+    } catch {
+      setCartData({ carts: [] });
     }
   };
 
@@ -27,7 +24,7 @@ function FrontLayout() {
     <>
       <Navbar cartData={cartData} />
       <MessageToast />
-      <Outlet context={{ cartData, getCartData, setCartData }}></Outlet>
+      <Outlet context={{ cartData, getCartData }}></Outlet>
       <div className="bg-dark">
         <div className="container">
           <div className="d-flex align-items-center justify-content-between text-white py-4">

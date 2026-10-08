@@ -12,7 +12,7 @@ export const CheckboxRadio = ({
     <>
       <div className="form-check">
         <input
-          className={`form-check-input ${errors[name] && "is-invalid"}`}
+          className={`form-check-input ${errors[name] ? "is-invalid" : ""}`}
           type={type}
           name={name}
           id={id}
@@ -39,7 +39,7 @@ export const Input = ({ id, labelText, register, type, errors, rules }) => {
       <input
         id={id}
         type={type}
-        className={`form-control ${errors[id] && "is-invalid"}`}
+        className={`form-control ${errors[id] ? "is-invalid" : ""}`}
         {...register(id, rules)}
       />
       {errors[id] && (
@@ -64,7 +64,7 @@ export const Select = ({
       </label>
       <select
         id={id}
-        className={`form-select ${errors[id] && "is-invalid"}`}
+        className={`form-select ${errors[id] ? "is-invalid" : ""}`}
         {...register(id, rules)}
         disabled={disabled}
       >

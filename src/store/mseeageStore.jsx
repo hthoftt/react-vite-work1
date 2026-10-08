@@ -23,7 +23,7 @@ export const messageReducer = (state, action) => {
       };
 
     default:
-      state;
+      return state;
   }
 };
 

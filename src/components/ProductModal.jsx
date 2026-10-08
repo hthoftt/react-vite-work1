@@ -1,5 +1,5 @@
-import axios from "axios";
 import { useState, useEffect, useContext } from "react";
+import { adminApi, getErrorData } from "../api";
 import {
   MessageContext,
   handleErrorDispatch,
@@ -14,12 +14,6 @@ function ProductModal({
   currentPage,
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  // 取得token資訊
-  const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("hexToken"))
-    ?.split("=")[1];
-
   // 預設產品資訊為空值
   const [tempData, setTempData] = useState({
     title: "",
@@ -68,31 +62,22 @@ function ProductModal({
   const submit = async () => {
     setIsLoading(true);
     try {
-      let api = `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/product`;
-      let method = "post";
-      if (type === "edit") {
-        api = `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/product/${tempProduct.id}`;
-        method = "put";
-      }
-      const res = await axios[method](
-        api,
-        { data: tempData },
-        {
-          headers: { Authorization: token },
-        },
-      );
+      const data = { data: tempData };
+      const res =
+        type === "edit"
+          ? await adminApi.put(`/product/${tempProduct.id}`, data)
+          : await adminApi.post("/product", data);
       handleSuccessDispatch(dispatch, type, res);
       closeProductModal(); // 關閉模組
       getProducts(currentPage); // 更新全部產品資訊
-      setIsLoading(false);
     } catch (err) {
-      handleErrorDispatch(dispatch, text);
+      handleErrorDispatch(dispatch, getErrorData(err).message);
+    } finally {
       setIsLoading(false);
     }
   };
 
   const uploadFile = async (file) => {
-    console.log(file);
     if (!file) {
       return;
     }
@@ -100,20 +85,11 @@ function ProductModal({
     formData.append("file-to-upload", file);
 
     try {
-      const res = await axios.post(
-        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/upload`,
-        formData,
-        {
-          headers: {
-            authorization: token,
-          },
-        },
-      );
-      console.log(res);
+      const res = await adminApi.post("/upload", formData);
       const { imageUrl } = res.data;
       setTempData({ ...tempData, imageUrl: imageUrl });
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      handleErrorDispatch(dispatch, getErrorData(err).message);
     }
   };
   return (

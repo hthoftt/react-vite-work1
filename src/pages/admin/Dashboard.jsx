@@ -2,6 +2,7 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useReducer } from "react";
 import Message from "../../components/Message";
 import axios from "axios";
+import { getToken, clearToken } from "../../api";
 import {
   MessageContext,
   messageReducer,
@@ -16,21 +17,18 @@ function Dashboard() {
 
   // 登出,清空hexToken並跳回登入畫面
   const logout = () => {
-    document.cookie = "hexToken=;";
-    navigate("/");
+    clearToken();
+    navigate("/login");
   };
 
-  // 取出 Token
-  const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("hexToken"))
-    ?.split("=")[1];
-  axios.defaults.headers.common["Authorization"] = token;
+  // 取出 Token (後台 API 由 adminApi 自動帶上)
+  const token = getToken();
 
   useEffect(() => {
     // 判斷是否有token,沒有就跳回登入畫面
     if (!token) {
-      return navigate("/");
+      navigate("/login");
+      return;
     }
     // 判斷token是否有效,無效就跳回登入畫面
     (async () => {
@@ -42,16 +40,10 @@ function Dashboard() {
             headers: { Authorization: token },
           },
         );
-      } catch (err) {
-        if (err.response) {
-          // console.error("伺服器錯誤:", err.response?.data?.message);
-          if (!err.response.data.success) {
-            navigate("/");
-          }
-        } else {
-          // console.error("網路錯誤:", err.message);
-          navigate("/");
-        }
+      } catch {
+        // token 無效或網路錯誤
+        clearToken();
+        navigate("/login");
       }
     })();
   }, [navigate, token]);
