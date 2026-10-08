@@ -1,40 +1,27 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams, Link, useOutletContext } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Loading from "../../components/Loading";
+import { api } from "../../api";
 
 function Success() {
   const { orderId } = useParams();
-  const [orderData, setOrderDate] = useState({});
+  const [orderData, setOrderData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const { setCartData } = useOutletContext();
 
-  const getCart = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get(
-        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/order/${orderId}`,
-      );
-      // console.log(res.data.order);
-      setOrderDate(res.data.order);
-      setIsLoading(false);
-    } catch (err) {
-      // console.log(err.response);
-    }
-  };
-
+  // 購物車在結帳頁送出訂單後就已重新取得,這裡只需取訂單
   useEffect(() => {
-    const getCartData = async () => {
-      const res = await axios.get(
-        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/cart`,
-      );
-      setCartData(res.data.data);
+    const getOrder = async () => {
+      setIsLoading(true);
+      try {
+        const res = await api.get(`/order/${orderId}`);
+        setOrderData(res.data.order);
+      } catch {
+        setOrderData({});
+      } finally {
+        setIsLoading(false);
+      }
     };
-    getCartData();
-  }, []);
-
-  useEffect(() => {
-    getCart(orderId);
+    getOrder();
   }, [orderId]);
 
   return (

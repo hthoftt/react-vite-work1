@@ -1,48 +1,47 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { getErrorData } from "../api";
 
 function Login() {
   // 登入狀態
   const [loginState, setLoginState] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   // 切換登入成功後畫面
   const navigate = useNavigate();
   // 建立帳號密碼
   const [data, setData] = useState({
-    username: "tonyhung92568@gmail.com",
-    password: "12345678",
+    username: "",
+    password: "",
   });
   // 讀取帳號密碼
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
-  // 送出帳號密碼
+  // 送出帳號密碼 (用 form submit,按 Enter 也會送出)
   const submit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
     try {
       const res = await axios.post("/v2/admin/signin", data);
       const { token, expired } = res.data;
-      document.cookie = `hexToken=${token}; expires=${new Date(expired)};`;
       // 儲存 Token,於指定時間後自動失效
+      document.cookie = `hexToken=${token}; expires=${new Date(expired).toUTCString()};`;
       if (res.data.success) {
         navigate("/admin/products");
       }
     } catch (error) {
-      console.log(error.response?.data);
-      setLoginState(error.response?.data);
-    }
-  };
-  // 連動鍵盤Enter為送出
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      submit();
+      setLoginState(getErrorData(error));
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
-        <div className="col-md-6">
+        <form className="col-md-6" onSubmit={submit}>
           <h2>登入帳號</h2>
           <div
             className={`alert alert-danger ${loginState.message ? "d-block" : "d-none"}`}
@@ -59,9 +58,10 @@ function Login() {
                 name="username"
                 value={data.username}
                 type="email"
-                placeholder="Email Address"
+                autoComplete="username"
+                placeholder="name@example.com"
                 onChange={handleChange}
-                onKeyDown={handleKeyDown}
+                required
               />
             </label>
           </div>
@@ -74,18 +74,17 @@ function Login() {
                 name="password"
                 value={data.password}
                 id="password"
-                placeholder="name@example.com"
+                autoComplete="current-password"
+                placeholder="請輸入密碼"
                 onChange={handleChange}
-                onKeyDown={handleKeyDown}
+                required
               />
             </label>
           </div>
-          <button type="button" className="btn btn-primary" onClick={submit}>
+          <button type="submit" className="btn btn-primary" disabled={isLoading}>
             登入
           </button>
-          <div className="mt-4">
-          </div>
-        </div>
+        </form>
       </div>
     </div>
   );

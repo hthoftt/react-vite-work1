@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Modal } from "bootstrap";
-import axios from "axios";
 import ProductModal from "../../components/ProductModal";
 import DeleteModal from "../../components/DeleteModal";
 import Pagination from "../../components/Pagination";
 import Loading from "../../components/Loading";
+import { adminApi } from "../../api";
 
 function AdminProducts() {
   const [products, setProducts] = useState([]); //存所有產品資訊
@@ -19,14 +19,14 @@ function AdminProducts() {
 
   const getProducts = async (page = 1) => {
     setLoading(true);
-    const productRes = await axios.get(
-      `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/products?page=${page}`,
-    ); // 拿資訊
-    // console.log(productRes);
-    setProducts(productRes.data.products); //存產品
-    setPagination(productRes.data.pagination); //存分頁
-    setCurrentPage(page);
-    setLoading(false);
+    try {
+      const productRes = await adminApi.get(`/products?page=${page}`); // 拿資訊
+      setProducts(productRes.data.products); //存產品
+      setPagination(productRes.data.pagination); //存分頁
+      setCurrentPage(page);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 進入頁面就會取得資料
@@ -59,27 +59,16 @@ function AdminProducts() {
     deleteModal.current.hide();
   };
 
-  // 取得token資訊
-  const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("hexToken"))
-    ?.split("=")[1];
-
   // 刪除產品
   const deleteProduct = async (id) => {
     try {
-      const res = await axios.delete(
-        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/product/${id}`,
-        {
-          headers: { Authorization: token },
-        },
-      );
+      const res = await adminApi.delete(`/product/${id}`);
       if (res.data.success === true) {
         getProducts(currentPage);
         closeDeleteModal();
       }
-    } catch (err) {
-      // console.error(err);
+    } catch {
+      closeDeleteModal();
     }
   };
 

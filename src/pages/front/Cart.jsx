@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useOutletContext, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { createAsyncMessage } from "../../slice/messageSlice";
-import axios from "axios";
+import { api, getErrorData } from "../../api";
 
 function Cart() {
   const dispatch = useDispatch();
@@ -13,25 +13,19 @@ function Cart() {
   // 刪除單一品項
   const deleteCart = async (id) => {
     try {
-      const res = await axios.delete(
-        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/cart/${id}`,
-      );
-      // console.log(res);
+      await api.delete(`/cart/${id}`);
       getCartData();
     } catch (err) {
-      // console.error(err.response);
+      dispatch(createAsyncMessage(getErrorData(err)));
     }
   };
   // 清空購物車
   const clearCartData = async () => {
     try {
-      const res = await axios.delete(
-        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/carts`,
-      );
-      // console.log(res);
+      await api.delete("/carts");
       getCartData();
     } catch (err) {
-      // console.error(err.response);
+      dispatch(createAsyncMessage(getErrorData(err)));
     }
   };
   // 更新商品數量
@@ -44,17 +38,13 @@ function Cart() {
     };
     setLoadingItems(true);
     try {
-      const res = await axios.put(
-        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/cart/${item.id}`,
-        data,
-      );
-      setLoadingItems(false);
-      // console.log(res);
+      const res = await api.put(`/cart/${item.id}`, data);
       getCartData();
       dispatch(createAsyncMessage(res.data));
     } catch (err) {
-      // console.error(err.response);
-      dispatch(createAsyncMessage(err.response.data));
+      dispatch(createAsyncMessage(getErrorData(err)));
+    } finally {
+      setLoadingItems(false);
     }
   };
 

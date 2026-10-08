@@ -1,5 +1,5 @@
-import axios from "axios";
 import { useState, useEffect, useContext } from "react";
+import { adminApi, getErrorData } from "../api";
 import {
   MessageContext,
   handleErrorDispatch,
@@ -24,12 +24,6 @@ function CouponModal({
   });
 
   const [, dispatch] = useContext(MessageContext);
-
-  // 取得token資訊
-  const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("hexToken"))
-    ?.split("=")[1];
 
   // 建立時間
   const [date, setDate] = useState(new Date());
@@ -67,26 +61,17 @@ function CouponModal({
   const submit = async () => {
     setIsLoading(true);
     try {
-      let api = `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/coupon`;
-      let method = "post";
-      if (type === "edit") {
-        api = `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/coupon/${tempCoupon.id}`;
-        method = "put";
-      }
-      const res = await axios[method](
-        api,
-        { data: { ...tempData, due_date: date.getTime() } },
-        {
-          headers: { Authorization: token },
-        },
-      );
-      // console.log(res);
+      const data = { data: { ...tempData, due_date: date.getTime() } };
+      const res =
+        type === "edit"
+          ? await adminApi.put(`/coupon/${tempCoupon.id}`, data)
+          : await adminApi.post("/coupon", data);
       closeModal(); // 關閉模組
       getCoupons(currentPage); // 更新全部產品資訊
       handleSuccessDispatch(dispatch, type, res);
-      setIsLoading(false);
     } catch (err) {
-      handleErrorDispatch(dispatch, text);
+      handleErrorDispatch(dispatch, getErrorData(err).message);
+    } finally {
       setIsLoading(false);
     }
   };

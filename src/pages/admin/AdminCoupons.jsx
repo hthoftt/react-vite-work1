@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Modal } from "bootstrap";
-import axios from "axios";
 import CouponModal from "../../components/CouponModal";
 import DeleteModal from "../../components/DeleteModal";
 import Pagination from "../../components/Pagination";
 import Loading from "../../components/Loading";
+import { adminApi } from "../../api";
 
 function AdminCoupons() {
   const [coupons, setCoupons] = useState([]); //存所有產品資訊
@@ -19,14 +19,14 @@ function AdminCoupons() {
 
   const getCoupons = async (page = 1) => {
     setLoading(true);
-    const res = await axios.get(
-      `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/coupons?page=${page}`,
-    ); // 拿資訊
-    // console.log(res);
-    setCoupons(res.data.coupons); //存產品
-    setPagination(res.data.pagination); //存分頁
-    setLoading(false);
-    setCurrentPage(page);
+    try {
+      const res = await adminApi.get(`/coupons?page=${page}`); // 拿資訊
+      setCoupons(res.data.coupons); //存產品
+      setPagination(res.data.pagination); //存分頁
+      setCurrentPage(page);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 進入頁面就會取得資料
@@ -59,27 +59,16 @@ function AdminCoupons() {
     deleteModal.current.hide();
   };
 
-  // 取得token資訊
-  const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("hexToken"))
-    ?.split("=")[1];
-
   // 刪除產品
   const deleteCoupon = async (id) => {
     try {
-      const res = await axios.delete(
-        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/coupon/${id}`,
-        {
-          headers: { Authorization: token },
-        },
-      );
+      const res = await adminApi.delete(`/coupon/${id}`);
       if (res.data.success === true) {
         getCoupons(currentPage);
         closeDeleteModal();
       }
-    } catch (err) {
-      // console.error(err);
+    } catch {
+      closeDeleteModal();
     }
   };
 

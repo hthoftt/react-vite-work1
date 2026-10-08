@@ -1,7 +1,11 @@
-import axios from "axios";
 import { useState, useEffect, useContext } from "react";
+import {
+  MessageContext,
+  handleErrorDispatch,
+} from "../store/mseeageStore";
+import { adminApi, getErrorData } from "../api";
 
-function OrderModal({ closeModal, getOrders, tempOrder,currentPage }) {
+function OrderModal({ closeModal, getOrders, tempOrder, currentPage }) {
   const [isLoading, setIsLoading] = useState(false);
   // 預設產品資訊為空值
   const [tempData, setTempData] = useState({
@@ -10,11 +14,7 @@ function OrderModal({ closeModal, getOrders, tempOrder,currentPage }) {
     ...tempOrder,
   });
 
-  // 取得token資訊
-  const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("hexToken"))
-    ?.split("=")[1];
+  const [, dispatch] = useContext(MessageContext);
 
   useEffect(() => {
     setTempData({
@@ -38,18 +38,12 @@ function OrderModal({ closeModal, getOrders, tempOrder,currentPage }) {
   const submit = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.put(
-        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/order/${tempOrder.id}`,
-        { data: { ...tempData } },
-        {
-          headers: { Authorization: token },
-        },
-      );
-      console.log(res);
+      await adminApi.put(`/order/${tempOrder.id}`, { data: { ...tempData } });
       closeModal(); // 關閉模組
       getOrders(currentPage); // 更新全部產品資訊
-      setIsLoading(false);
     } catch (err) {
+      handleErrorDispatch(dispatch, getErrorData(err).message);
+    } finally {
       setIsLoading(false);
     }
   };

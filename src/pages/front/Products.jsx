@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import Pagination from "../../components/Pagination";
 import Loading from "../../components/Loading";
+import { api } from "../../api";
 
 function Products() {
   const [products, setProducts] = useState([]); // 存所有資料
@@ -11,13 +11,13 @@ function Products() {
 
   const getProducts = async (page = 1) => {
     setIsLoading(true);
-    const res = await axios.get(
-      `/v2/api/${import.meta.env.VITE_APP_API_PATH}/products?page=${page}`,
-    );
-    setProducts(res.data.products);
-    setPagination(res.data.pagination);
-    // console.log("所有商品:", res);
-    setIsLoading(false);
+    try {
+      const res = await api.get(`/products?page=${page}`);
+      setProducts(res.data.products);
+      setPagination(res.data.pagination);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
