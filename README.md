@@ -4,8 +4,13 @@
 
 🔗 [線上 Demo](https://hthoftt.github.io/react-vite-work1/)
 
-<!-- 補一張截圖或後台操作 GIF：把圖片放進 repo，再取消下一行註解 -->
-<!-- ![畫面截圖](./screenshot.png) -->
+| 首頁 | 商品列表 |
+|---|---|
+| ![首頁](./docs/screenshot-home.jpg) | ![商品列表](./docs/screenshot-products.jpg) |
+
+**後台操作：商品、優惠券、訂單管理**（後台需登入，以下為操作錄影）
+
+![後台操作：商品、優惠券、訂單管理](./docs/admin-demo.gif)
 
 ## 功能
 
