@@ -293,7 +293,6 @@ function ProductModal({
               </div>
             </div>
           </div>
-          <div className="modal-body">...</div>
           <div className="modal-footer">
             <button
               type="button"
