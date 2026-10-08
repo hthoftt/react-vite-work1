@@ -30,7 +30,7 @@ function CheckOut() {
       `/v2/api/${import.meta.env.VITE_APP_API_PATH}/order`,
       form,
     );
-    console.log("確認表單:",res);
+    // console.log("確認表單:",res);
     navigate(`/success/${res.data.orderId}`);
   };
 
@@ -111,8 +111,8 @@ function CheckOut() {
               </div>
             </div>
             <div className="d-flex flex-column-reverse flex-md-row mt-4 justify-content-between align-items-md-center align-items-end w-100">
-              <Link className="text-dark mt-md-0 mt-3" to="/cart">
-                <i className="bi bi-chevron-left me-2"></i> 繼續點餐
+              <Link className="text-dark mt-md-0 mt-3" to="/products">
+                <i className="bi bi-chevron-left me-2"></i> 繼續選購
               </Link>
               <button
                 type="submit"
@@ -124,7 +124,7 @@ function CheckOut() {
           </form>
           <div className="col-md-4">
             <div className="border p-4 mb-4">
-              <h4 className="mb-4">選購餐點</h4>
+              <h4 className="mb-4">選購商品</h4>
               {cartData?.carts?.map((item) => {
                 return (
                   <div className="d-flex" key={item.id}>

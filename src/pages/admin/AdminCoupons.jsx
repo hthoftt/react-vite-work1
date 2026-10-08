@@ -15,16 +15,18 @@ function AdminCoupons() {
   const couponModal = useRef(null); // 商品模板開關
   const deleteModal = useRef(null); // 刪除模板開關
   const [isLoading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); // 新增分頁狀態
 
   const getCoupons = async (page = 1) => {
     setLoading(true);
     const res = await axios.get(
       `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/coupons?page=${page}`,
     ); // 拿資訊
-    console.log(res);
+    // console.log(res);
     setCoupons(res.data.coupons); //存產品
     setPagination(res.data.pagination); //存分頁
     setLoading(false);
+    setCurrentPage(page);
   };
 
   // 進入頁面就會取得資料
@@ -73,11 +75,11 @@ function AdminCoupons() {
         },
       );
       if (res.data.success === true) {
-        getCoupons();
+        getCoupons(currentPage);
         closeDeleteModal();
       }
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
   };
 
@@ -89,6 +91,7 @@ function AdminCoupons() {
         getCoupons={getCoupons}
         tempCoupon={tempProduct}
         type={type}
+        currentPage={currentPage}
       />
       <DeleteModal
         closeDeleteModal={closeDeleteModal}

@@ -15,7 +15,7 @@ function Navbar({ cartData }) {
                 top: "50%",
               }}
             >
-              畫作展
+              畫廊
             </Link>
             <button
               className="navbar-toggler"

@@ -1,6 +1,6 @@
 import { Outlet, Link } from "react-router-dom";
-import Navbar from "./Navbar";
 import { useEffect, useState } from "react";
+import Navbar from "./Navbar";
 import axios from "axios";
 import MessageToast from "../../components/MessageToast";
 
@@ -12,10 +12,10 @@ function FrontLayout() {
       const res = await axios.get(
         `/v2/api/${import.meta.env.VITE_APP_API_PATH}/cart`,
       );
-      // console.log("購物車:", res.data.data);
-      setCartData(res.data.data);
+      // console.log(res);
+      setCartData(res.data.data || { carts: [] });
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
   };
 
@@ -27,13 +27,13 @@ function FrontLayout() {
     <>
       <Navbar cartData={cartData} />
       <MessageToast />
-      <Outlet context={{ cartData, getCartData }}></Outlet>
+      <Outlet context={{ cartData, getCartData, setCartData }}></Outlet>
       <div className="bg-dark">
         <div className="container">
           <div className="d-flex align-items-center justify-content-between text-white py-4">
             <p className="mb-0">
-              © 2026 hthoftt All Rights Reserved. |{" "}
-              <Link href="/privacy">Privacy Policy</Link>
+              © 2026 HTHOFTT All Rights Reserved. |{" "}
+              <Link to="/">Privacy Policy</Link>
             </p>
             <ul className="d-flex list-unstyled mb-0 h4">
               <li>

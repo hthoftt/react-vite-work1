@@ -13,16 +13,18 @@ function AdminOrders() {
   const ordersModal = useRef(null); // 商品模板開關
   const deleteModal = useRef(null); // 刪除模板開關
   const [isLoading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); // 新增分頁狀態
 
   const getOrders = async (page = 1) => {
     setLoading(true);
     const res = await axios.get(
       `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/orders?page=${page}`,
     ); // 拿資訊
-    console.log("order:", res);
+    // console.log("order:", res);
     setOrders(res.data.orders); //存產品
     setPagination(res.data.pagination); //存分頁
     setLoading(false);
+    setCurrentPage(page);
   };
 
   // 進入頁面就會取得資料
@@ -60,12 +62,12 @@ function AdminOrders() {
       const res = await axios.delete(
         `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/order/${tempOrder.id}`,
       );
-      console.log(res);
+      // console.log(res);
       setLoading(false);
-      getOrders();
+      getOrders(currentPage);
       closeDeleteModal();
     } catch (err) {
-      console.error(err.response);
+      // console.error(err.response);
       closeDeleteModal();
       setLoading(false);
     }
@@ -78,6 +80,7 @@ function AdminOrders() {
         closeModal={closeModal}
         getOrders={getOrders}
         tempOrder={tempOrder}
+        currentPage={currentPage}
       />
       <DeleteModal
         closeDeleteModal={closeDeleteModal}

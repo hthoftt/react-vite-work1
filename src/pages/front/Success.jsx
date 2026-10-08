@@ -1,13 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useOutletContext } from "react-router-dom";
 import Loading from "../../components/Loading";
 
 function Success() {
   const { orderId } = useParams();
   const [orderData, setOrderDate] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-
+  const { setCartData } = useOutletContext();
 
   const getCart = async () => {
     setIsLoading(true);
@@ -15,13 +15,23 @@ function Success() {
       const res = await axios.get(
         `/v2/api/${import.meta.env.VITE_APP_API_PATH}/order/${orderId}`,
       );
-      console.log(res.data.order);
+      // console.log(res.data.order);
       setOrderDate(res.data.order);
       setIsLoading(false);
     } catch (err) {
-      console.log(err.response);
+      // console.log(err.response);
     }
   };
+
+  useEffect(() => {
+    const getCartData = async () => {
+      const res = await axios.get(
+        `/v2/api/${import.meta.env.VITE_APP_API_PATH}/cart`,
+      );
+      setCartData(res.data.data);
+    };
+    getCartData();
+  }, []);
 
   useEffect(() => {
     getCart(orderId);
@@ -34,19 +44,19 @@ function Success() {
         style={{
           minHeight: "400px",
           backgroundImage:
-            "url(https://images.unsplash.com/photo-1480399129128-2066acb5009e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80)",
+            `URL("./success_photo.jpg")`,
           backgroundPosition: "center center",
         }}
       ></div>
       <div className="mt-5 mb-7">
         <div className="row">
           <div className="col-md-6">
-            <h2>餐點選購成功</h2>
+            <h2>商品選購成功</h2>
             <p className="text-muted">
-              親愛的顧客，感謝您在本平台訂餐。我們非常感激您對我們的信任和支持，讓我們有機會為您提供美味的餐點和優質的服務。
+              親愛的顧客，感謝您在本平台選購。我們非常感激您對我們的信任和支持，讓我們有機會為您提供優質的服務。
             </p>
             <p className="text-muted">
-              感謝您選擇本平台，祝您用餐愉快，生活愉快！
+              感謝您選擇本平台，祝您事事順心，生活愉快！
             </p>
             <Link to="/" className="btn btn-outline-dark me-2 rounded-0 mb-4">
               回到首頁
@@ -55,7 +65,7 @@ function Success() {
           <div className="col-md-6">
             <div className="card rounded-0 py-4">
               <div className="card-header border-bottom-0 bg-white px-4 py-0">
-                <h2>選購餐點細節</h2>
+                <h2>選購商品清單</h2>
               </div>
               <div className="card-body px-4 py-0">
                 <ul className="list-group list-group-flush">

@@ -6,7 +6,13 @@ import {
   handleSuccessDispatch,
 } from "../store/mseeageStore";
 
-function ProductModal({ closeProductModal, getProducts, type, tempProduct }) {
+function ProductModal({
+  closeProductModal,
+  getProducts,
+  type,
+  tempProduct,
+  currentPage,
+}) {
   const [isLoading, setIsLoading] = useState(false);
   // 取得token資訊
   const token = document.cookie
@@ -77,7 +83,7 @@ function ProductModal({ closeProductModal, getProducts, type, tempProduct }) {
       );
       handleSuccessDispatch(dispatch, type, res);
       closeProductModal(); // 關閉模組
-      getProducts(); // 更新全部產品資訊
+      getProducts(currentPage); // 更新全部產品資訊
       setIsLoading(false);
     } catch (err) {
       handleErrorDispatch(dispatch, text);

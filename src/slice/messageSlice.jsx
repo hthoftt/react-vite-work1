@@ -29,7 +29,7 @@ export const messageSlice = createSlice({
       //   }, 2000);
     },
     removeMessage(state, action) {
-      console.log("removeMessage:", action.payload);
+      // console.log("removeMessage:", action.payload);
       const index = state.findIndex((item) => item === action.payload);
       state.splice(index, 1);
     },

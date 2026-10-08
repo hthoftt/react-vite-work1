@@ -9,8 +9,8 @@ function Login() {
   const navigate = useNavigate();
   // 建立帳號密碼
   const [data, setData] = useState({
-    username: "",
-    password: "",
+    username: "tonyhung92568@gmail.com",
+    password: "12345678",
   });
   // 讀取帳號密碼
   const handleChange = (e) => {
@@ -57,6 +57,7 @@ function Login() {
                 id="email"
                 className="form-control"
                 name="username"
+                value={data.username}
                 type="email"
                 placeholder="Email Address"
                 onChange={handleChange}
@@ -71,6 +72,7 @@ function Login() {
                 type="password"
                 className="form-control"
                 name="password"
+                value={data.password}
                 id="password"
                 placeholder="name@example.com"
                 onChange={handleChange}
@@ -82,9 +84,6 @@ function Login() {
             登入
           </button>
           <div className="mt-4">
-            <p className="text-end text-secondary">
-              # tonyhung92568@gmail.com # 12345678
-            </p>
           </div>
         </div>
       </div>

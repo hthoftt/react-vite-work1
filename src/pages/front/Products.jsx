@@ -16,7 +16,7 @@ function Products() {
     );
     setProducts(res.data.products);
     setPagination(res.data.pagination);
-    console.log("所有商品:", res);
+    // console.log("所有商品:", res);
     setIsLoading(false);
   };
 

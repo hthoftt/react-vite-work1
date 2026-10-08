@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useOutletContext, useParams,Link } from "react-router-dom";
+import { useOutletContext, useParams, Link } from "react-router-dom";
 import axios from "axios";
 import Loading from "../../components/Loading";
 import { useDispatch } from "react-redux";
@@ -19,11 +19,11 @@ function ProductDetail() {
       const res = await axios.get(
         `/v2/api/${import.meta.env.VITE_APP_API_PATH}/product/${id}`,
       );
-      console.log("單一商品:", res.data.product);
+      // console.log("單一商品:", res.data.product);
       setProduct(res.data.product);
       setIsLoading(false);
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
   };
 
@@ -40,12 +40,12 @@ function ProductDetail() {
         `/v2/api/${import.meta.env.VITE_APP_API_PATH}/cart`,
         data,
       );
-      console.log("加入購物車:", res);
+      // console.log("加入購物車:", res);
       dispatch(createAsyncMessage(res.data));
       setIsLoading(false);
       getCartData();
     } catch (err) {
-      console.error(err.response);
+      // console.error(err.response);
       setIsLoading(false);
       dispatch(createAsyncMessage(err.response.data));
     }
@@ -112,19 +112,20 @@ function ProductDetail() {
               </button>
             </div>
           </div>
-          <button
+          <Link
             type="button"
             className="btn btn-dark btn-block w-100 rounded-0 py-3"
             onClick={addToCart}
             disabled={isLoading}
+            to="/products"
           >
             加入購物車
-          </button>
+          </Link>
         </div>
       </div>
-        <Link className="btn btn-dark mb-7 rounded-0" to="/products">
-          前往商品頁
-        </Link>
+      <Link className="btn btn-dark mb-7 rounded-0" to="/products">
+        前往商品頁
+      </Link>
     </div>
   );
 }

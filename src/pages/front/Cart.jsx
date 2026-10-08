@@ -16,10 +16,10 @@ function Cart() {
       const res = await axios.delete(
         `/v2/api/${import.meta.env.VITE_APP_API_PATH}/cart/${id}`,
       );
-      console.log(res);
+      // console.log(res);
       getCartData();
     } catch (err) {
-      console.error(err.response);
+      // console.error(err.response);
     }
   };
   // 清空購物車
@@ -28,10 +28,10 @@ function Cart() {
       const res = await axios.delete(
         `/v2/api/${import.meta.env.VITE_APP_API_PATH}/carts`,
       );
-      console.log(res);
+      // console.log(res);
       getCartData();
     } catch (err) {
-      console.error(err.response);
+      // console.error(err.response);
     }
   };
   // 更新商品數量
@@ -49,11 +49,11 @@ function Cart() {
         data,
       );
       setLoadingItems(false);
-      console.log(res);
+      // console.log(res);
       getCartData();
       dispatch(createAsyncMessage(res.data));
     } catch (err) {
-      console.error(err.response);
+      // console.error(err.response);
       dispatch(createAsyncMessage(err.response.data));
     }
   };
@@ -134,7 +134,11 @@ function Cart() {
           <Link
             type="button"
             className="btn btn-dark w-100 mt-4 rounded-0 py-3"
-            to={`/checkout`}
+            to={
+              Array.isArray(cartData.carts) && cartData.carts.length > 0
+                ? "/checkout"
+                : "/products"
+            }
           >
             確認購物車正確
           </Link>

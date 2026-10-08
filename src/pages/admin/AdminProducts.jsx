@@ -9,6 +9,7 @@ import Loading from "../../components/Loading";
 function AdminProducts() {
   const [products, setProducts] = useState([]); //存所有產品資訊
   const [pagination, setPagination] = useState({}); //存分頁
+  const [currentPage, setCurrentPage] = useState(1); // 新增分頁狀態
   // type: 決定modal展開的用途
   const [type, setType] = useState("create"); //判斷create或edit
   const [tempProduct, setTempProduct] = useState({}); //存目前點擊的產品
@@ -21,9 +22,10 @@ function AdminProducts() {
     const productRes = await axios.get(
       `/v2/api/${import.meta.env.VITE_APP_API_PATH}/admin/products?page=${page}`,
     ); // 拿資訊
-    console.log(productRes);
+    // console.log(productRes);
     setProducts(productRes.data.products); //存產品
     setPagination(productRes.data.pagination); //存分頁
+    setCurrentPage(page);
     setLoading(false);
   };
 
@@ -73,11 +75,11 @@ function AdminProducts() {
         },
       );
       if (res.data.success === true) {
-        getProducts();
+        getProducts(currentPage);
         closeDeleteModal();
       }
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
   };
 
@@ -89,6 +91,7 @@ function AdminProducts() {
         getProducts={getProducts}
         tempProduct={tempProduct}
         type={type}
+        currentPage={currentPage}
       />
       <DeleteModal
         closeDeleteModal={closeDeleteModal}

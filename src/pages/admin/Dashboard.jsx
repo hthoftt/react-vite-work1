@@ -44,12 +44,12 @@ function Dashboard() {
         );
       } catch (err) {
         if (err.response) {
-          console.error("伺服器錯誤:", err.response?.data?.message);
+          // console.error("伺服器錯誤:", err.response?.data?.message);
           if (!err.response.data.success) {
             navigate("/");
           }
         } else {
-          console.error("網路錯誤:", err.message);
+          // console.error("網路錯誤:", err.message);
           navigate("/");
         }
       }

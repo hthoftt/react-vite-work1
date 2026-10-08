@@ -6,7 +6,13 @@ import {
   handleSuccessDispatch,
 } from "../store/mseeageStore";
 
-function CouponModal({ closeModal, getCoupons, type, tempCoupon }) {
+function CouponModal({
+  closeModal,
+  getCoupons,
+  type,
+  tempCoupon,
+  currentPage,
+}) {
   const [isLoading, setIsLoading] = useState(false);
   // 預設產品資訊為空值
   const [tempData, setTempData] = useState({
@@ -76,7 +82,7 @@ function CouponModal({ closeModal, getCoupons, type, tempCoupon }) {
       );
       // console.log(res);
       closeModal(); // 關閉模組
-      getCoupons(); // 更新全部產品資訊
+      getCoupons(currentPage); // 更新全部產品資訊
       handleSuccessDispatch(dispatch, type, res);
       setIsLoading(false);
     } catch (err) {

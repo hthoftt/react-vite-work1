@@ -1,12 +1,7 @@
 import axios from "axios";
 import { useState, useEffect, useContext } from "react";
-import {
-  MessageContext,
-  handleErrorDispatch,
-  handleSuccessDispatch,
-} from "../store/mseeageStore";
 
-function OrderModal({ closeModal, getOrders, tempOrder }) {
+function OrderModal({ closeModal, getOrders, tempOrder,currentPage }) {
   const [isLoading, setIsLoading] = useState(false);
   // 預設產品資訊為空值
   const [tempData, setTempData] = useState({
@@ -52,7 +47,7 @@ function OrderModal({ closeModal, getOrders, tempOrder }) {
       );
       console.log(res);
       closeModal(); // 關閉模組
-      getOrders(); // 更新全部產品資訊
+      getOrders(currentPage); // 更新全部產品資訊
       setIsLoading(false);
     } catch (err) {
       setIsLoading(false);
